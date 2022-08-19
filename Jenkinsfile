@@ -64,8 +64,8 @@ pipeline {
 
     }
     
-      stage('Configure Databricks') {
-        steps {
+      //stage('Configure Databricks') {
+       // steps {
           // withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) { 
             //sh """#!/bin/bash
                 
@@ -88,8 +88,8 @@ pipeline {
                // 15001" | databricks-connect configure
                 //  """
            //}
-      }
-    }
+     // }
+    //}
 
    
     stage('Unit Tests') {
