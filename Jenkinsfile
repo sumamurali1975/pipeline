@@ -72,15 +72,15 @@ pipeline {
               //  source $WORKSPACE/miniconda/etc/profile.d/conda.sh
                // conda activate mlops2
 
-                #pip install -r requirements.txt
+                //#pip install -r requirements.txt
                 //export PATH="$HOME/.local/bin:$PATH"
                 //echo $PATH
           
-                # Configure Databricks CLI for deployment
+               // # Configure Databricks CLI for deployment
                 //echo "${DBURL}
                 //$TOKEN" | databricks configure --token
 
-                # Configure Databricks Connect
+               // # Configure Databricks Connect
                // echo "${DBURL}
                // $TOKEN
                // ${CLUSTERID}
