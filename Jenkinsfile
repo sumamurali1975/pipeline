@@ -37,6 +37,7 @@ pipeline {
             conda update -q conda
             conda create --name mlops2
             echo ${project.buildDir}
+            echo ${BUILDPATH}
 
             '''
         }
