@@ -66,28 +66,28 @@ pipeline {
     
       stage('Configure Databricks') {
         steps {
-           withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) { 
-            sh """#!/bin/bash
+          // withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) { 
+            //sh """#!/bin/bash
                 
-                source $WORKSPACE/miniconda/etc/profile.d/conda.sh
-                conda activate mlops2
+              //  source $WORKSPACE/miniconda/etc/profile.d/conda.sh
+               // conda activate mlops2
 
                 #pip install -r requirements.txt
-                export PATH="$HOME/.local/bin:$PATH"
-                echo $PATH
+                //export PATH="$HOME/.local/bin:$PATH"
+                //echo $PATH
           
                 # Configure Databricks CLI for deployment
-                echo "${DBURL}
-                $TOKEN" | databricks configure --token
+                //echo "${DBURL}
+                //$TOKEN" | databricks configure --token
 
                 # Configure Databricks Connect
-                echo "${DBURL}
-                $TOKEN
-                ${CLUSTERID}
-                0
-                15001" | databricks-connect configure
-                  """
-           }
+               // echo "${DBURL}
+               // $TOKEN
+               // ${CLUSTERID}
+               // 0
+               // 15001" | databricks-connect configure
+                //  """
+           //}
       }
     }
 
