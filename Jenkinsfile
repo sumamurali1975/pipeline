@@ -36,6 +36,7 @@ pipeline {
             conda config --set always_yes yes --set changeps1 no
             conda update -q conda
             conda create --name mlops2
+            echo ${project.buildDir}
 
             '''
         }
