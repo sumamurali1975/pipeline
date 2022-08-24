@@ -92,7 +92,7 @@ pipeline {
               mkdir -p "${BUILDPATH}/Libraries/python"
               mkdir -p "${BUILDPATH}/Validation/Output"
               
-              cp ${WORKSPACE}/Workspace/*.ipynb ${BUILDPATH}/Workspace
+              cp ${WORKSPACE}/Notebooks/*.ipynb ${BUILDPATH}/Workspace
     
               # Get packaged libs
               find ${LIBRARYPATH} -name '*.whl' | xargs -I '{}' cp '{}' ${BUILDPATH}/Libraries/python/
