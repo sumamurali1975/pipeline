@@ -3,11 +3,11 @@ pipeline {
 
   environment {
     
-    WORKSPACE           = '.'
-    DBRKS_BEARER_TOKEN  = "xyz"
-    DBTOKEN             ="DBTOKEN"
-    CLUSTERID           ="1228-220746-bqqkddxs"
-    DBURL               ="https://adb-6840195589605290.10.azuredatabricks.net"
+    //WORKSPACE           = '.'
+    //DBRKS_BEARER_TOKEN  = "xyz"
+    DBTOKEN             = "databricks-token"
+    CLUSTERID           = "AWS-Glue Catalogue Cluster"
+    DBURL               = "https://dbc-db420c65-4456.cloud.databricks.com"
 
     TESTRESULTPATH  ="./teste_results"
     LIBRARYPATH     = "./Libraries"
@@ -17,7 +17,9 @@ pipeline {
     DBFSPATH        = "dbfs:/FileStore/"
     BUILDPATH       = "${WORKSPACE}/Builds/${env.JOB_NAME}-${env.BUILD_NUMBER}"
     SCRIPTPATH      = "./Scripts"
-  }
+    projectName = "${WORKSPACE}/Builds/"  //var/lib/jenkins/workspace/Demopipeline/
+    projectKey = "key"
+      }
 
   stages {
     stage('Install Miniconda') {
@@ -53,7 +55,7 @@ pipeline {
 
             export PATH="$HOME/.local/bin:$PATH"
             echo $PATH
-
+            
             pip install --user databricks-cli
             pip install -U databricks-connect
             pip install pytest
@@ -64,32 +66,28 @@ pipeline {
 
     }
     
-      //stage('Configure Databricks') {
-       // steps {
-          // withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) { 
-            //sh """#!/bin/bash
-                
-              //  source $WORKSPACE/miniconda/etc/profile.d/conda.sh
-               // conda activate mlops2
+    stage('Setup') {
+		steps{
+		  withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) {
+			sh """#!/bin/bash
+                # Configure Databricks CLI for deployment
+				        echo "${DBURL}
+				        $TOKEN" | databricks configure --token
 
-                //#pip install -r requirements.txt
-                //export PATH="$HOME/.local/bin:$PATH"
-                //echo $PATH
-          
-               // # Configure Databricks CLI for deployment
-                //echo "${DBURL}
-                //$TOKEN" | databricks configure --token
-
-               // # Configure Databricks Connect
-               // echo "${DBURL}
-               // $TOKEN
-               // ${CLUSTERID}
-               // 0
-               // 15001" | databricks-connect configure
-                //  """
-           //}
-     // }
-    //}
+				        # Configure Databricks Connect for testing
+				        echo "${DBURL}
+				        $TOKEN
+				        ${CLUSTERID}
+				        0
+				        15001" | databricks-connect configure
+				        echo "list the workspace and below are the notebooks:"
+				        databricks workspace ls /Users/emmanuel.mua@ibm.com
+			   """
+		  }
+		}
+	}
+    
+   
 
    
     stage('Unit Tests') {
@@ -114,95 +112,17 @@ pipeline {
       }
     }
 
-    stage('Build Artifact') {
-        steps {
-            sh """mkdir -p "${BUILDPATH}/Workspace"
-              mkdir -p "${BUILDPATH}/Libraries/python"
-              mkdir -p "${BUILDPATH}/Validation/Output"
-              
-              cp ${WORKSPACE}/Workspace/*.ipynb ${BUILDPATH}/Workspace
-    
-              # Get packaged libs
-              find ${LIBRARYPATH} -name '*.whl' | xargs -I '{}' cp '{}' ${BUILDPATH}/Libraries/python/
+stage('build && SonarQube analysis') {
+          steps {
+            //def scannerhome = tool name: 'SonarQubeScanner'
 
-              # Generate artifact
-              #tar -czvf Builds/latest_build.tar.gz ${BUILDPATH}
-           """
+            withEnv(["PATH=/usr/bin:/usr/local/jdk-11.0.2/bin:/opt/sonarqube/sonar-scanner/bin/"]) {
+           withSonarQubeEnv('sonar') {
+                     sh "/opt/sonar-scanner/bin/sonar-scanner -Dsonar.projectKey=demo-project -Dsonar.projectVersion=0.0.1 -Dsonar.sources=${projectName} -Dsonar.host.url=http://107.20.71.233:9001 -Dsonar.login=ab9d8f9c15baff5428b9bf18b0ec198a5b35c6bb"
+                }
+              }
+        }
         }
 
-    }
-
-    stage('Deploy') {
-          steps { 
-            withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) {        
-              sh """#!/bin/bash
-                source $WORKSPACE/miniconda/etc/profile.d/conda.sh
-                conda activate mlops2
-                export PATH="$HOME/.local/bin:$PATH"
-
-
-                # Use Databricks CLI to deploy notebooks
-                databricks workspace import_dir --overwrite ${BUILDPATH}/Workspace ${WORKSPACEPATH}
-                dbfs cp -r ${BUILDPATH}/Libraries/python ${DBFSPATH}
-                """
-            }
-          }
-    }
-
-    stage('Run Integration Tests') {
-      steps {   
-          withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) {
-          
-          sh """#!/bin/bash
-                source $WORKSPACE/miniconda/etc/profile.d/conda.sh
-                conda activate mlops2
-                export PATH="$HOME/.local/bin:$PATH"
-
-                python3 ${SCRIPTPATH}/executenotebook.py --workspace=${DBURL}\
-                          --token=$TOKEN\
-                          --clusterid=${CLUSTERID}\
-                          --localpath=${NOTEBOOKPATH}/VALIDATION\
-                          --workspacepath=${WORKSPACEPATH}/VALIDATION\
-                          --outfilepath=${OUTFILEPATH}
-             """
-          }
-        sh """sed -i -e 's #ENV# ${OUTFILEPATH} g' ${SCRIPTPATH}/evaluatenotebookruns.py
-              python3 -m pytest --junit-xml=${TESTRESULTPATH}/TEST-notebookout.xml ${SCRIPTPATH}/evaluatenotebookruns.py || true
-           """
-      }
-    }
-
-    stage('Execute Notebook') {
-      steps {
-           withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) { 
-            sh """#!/bin/bash
-                
-                source $WORKSPACE/miniconda/etc/profile.d/conda.sh
-                conda activate mlops2
-
-                #pip install -r requirements.txt
-                export PATH="$HOME/.local/bin:$PATH"
-                echo $PATH
-
-                
-
-                # Configure Databricks Connect for testing
-                echo "${DBURL}
-                $TOKEN
-                ${CLUSTERID}
-                0
-                15001" | databricks-connect configure
-
-                python ${SCRIPTPATH}/executenotebook.py --workspace=${DBURL}\
-                      --token=$TOKEN\
-                      --clusterid=${CLUSTERID}\
-                      --localpath=${NOTEBOOKPATH}\
-                      --workspacepath=${WORKSPACEPATH}\
-                      --outfilepath=${OUTFILEPATH}
-                """
-                
-           }
-      }
-    }
   } 
 }
