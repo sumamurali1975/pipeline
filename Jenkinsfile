@@ -13,7 +13,7 @@ pipeline {
     LIBRARYPATH     = "./Libraries"
     OUTFILEPATH     = "./Validation/Output"
     NOTEBOOKPATH    = "./Notebooks"
-    WORKSPACEPATH   = "/Shared"
+    WORKSPACEPATH   = "/Users/subho.majumdar@ibm.com"               //"/Shared"
     DBFSPATH        = "dbfs:/FileStore/"
     BUILDPATH       = "${WORKSPACE}/Builds/${env.JOB_NAME}-${env.BUILD_NUMBER}"
     SCRIPTPATH      = "./Scripts"
@@ -66,7 +66,7 @@ pipeline {
 
     }
     
-    stage('Setup') {
+    stage('Databricks Setup') {
 		steps{
 		  withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) {
 			sh """#!/bin/bash
@@ -87,6 +87,22 @@ pipeline {
 		}
 	}
     
+    stage('Databricks Deploy') {
+          steps { 
+            withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) {        
+              sh """#!/bin/bash
+                source $WORKSPACE/miniconda/etc/profile.d/conda.sh
+                conda activate mlops2
+                export PATH="$HOME/.local/bin:$PATH"
+
+
+                # Use Databricks CLI to deploy notebooks
+                databricks workspace import_dir --overwrite ${BUILDPATH}/Workspace ${WORKSPACEPATH}
+                dbfs cp -r ${BUILDPATH}/Libraries/python ${DBFSPATH}
+                """
+            }
+          }
+    }
    
 
    
