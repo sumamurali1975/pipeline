@@ -86,7 +86,23 @@ pipeline {
 		  }
 		}
 	}
+    stage('Build Artifact') {
+        steps {
+            sh """mkdir -p "${BUILDPATH}/Workspace"
+              mkdir -p "${BUILDPATH}/Libraries/python"
+              mkdir -p "${BUILDPATH}/Validation/Output"
+              
+              cp ${WORKSPACE}/Workspace/*.ipynb ${BUILDPATH}/Workspace
     
+              # Get packaged libs
+              find ${LIBRARYPATH} -name '*.whl' | xargs -I '{}' cp '{}' ${BUILDPATH}/Libraries/python/
+
+              # Generate artifact
+              #tar -czvf Builds/latest_build.tar.gz ${BUILDPATH}
+           """
+        }
+
+    }
     stage('Databricks Deploy') {
           steps { 
             withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) {        
