@@ -13,7 +13,7 @@ pipeline {
     LIBRARYPATH     = "./Libraries"
     OUTFILEPATH     = "./Validation/Output"
     NOTEBOOKPATH    = "./Notebooks"
-    WORKSPACEPATH   = "/Users/subho.majumdar@ibm.com/dpa-notebooks"               //"/Shared"
+    WORKSPACEPATH   = "/Users/subho.majumdar@ibm.com/demo"               //"/Shared"
     DBFSPATH        = "dbfs:/FileStore/"
     BUILDPATH       = "${WORKSPACE}/Builds/${env.JOB_NAME}-${env.BUILD_NUMBER}"
     SCRIPTPATH      = "./Scripts"
