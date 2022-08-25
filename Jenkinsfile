@@ -13,7 +13,7 @@ pipeline {
     LIBRARYPATH     = "./Libraries"
     OUTFILEPATH     = "./Validation/Output"
     NOTEBOOKPATH    = "./Notebooks"
-    WORKSPACEPATH   = "/Users/subho.majumdar@ibm.com"               //"/Shared"
+    WORKSPACEPATH   = "/Users/subho.majumdar@ibm.com/dpa-notebooks"               //"/Shared"
     DBFSPATH        = "dbfs:/FileStore/"
     BUILDPATH       = "${WORKSPACE}/Builds/${env.JOB_NAME}-${env.BUILD_NUMBER}"
     SCRIPTPATH      = "./Scripts"
@@ -113,6 +113,7 @@ pipeline {
 
 
                 # Use Databricks CLI to deploy notebooks
+		databricks workspace mkdirs ${WORKSPACEPATH}
                 databricks workspace import_dir --overwrite ${BUILDPATH}/Workspace ${WORKSPACEPATH}
                 dbfs cp -r ${BUILDPATH}/Libraries/python ${DBFSPATH}
                 """
