@@ -137,7 +137,7 @@ pipeline {
 		conda list
 
                 # Python tests for libs
-                python -m pytest -v --junit-xml=${TESTRESULTPATH}/TEST-libout.xml ${LIBRARYPATH}/python/dbxdemo/test*.py || true
+                python3 -m pytest -v --junit-xml=${TESTRESULTPATH}/TEST-libout.xml ${LIBRARYPATH}/python/dbxdemo/test*.py || true
                 """
           } catch(err) {
             step([$class: 'JUnitResultArchiver', testResults: '--junit-xml=${TESTRESULTPATH}/TEST-*.xml'])
