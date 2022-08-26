@@ -1,2 +1,2 @@
 databricks-cli==0.16.2
-pytest==7.1.2
+testbook == 0.4.2
