@@ -58,7 +58,7 @@ pipeline {
             
             pip install --user databricks-cli
             pip install -U databricks-connect
-            pip install pytest
+            pip install -r requirements.txt
             databricks --version
 
            '''
