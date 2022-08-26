@@ -40,7 +40,8 @@ pipeline {
             conda create --name mlops2
             
             echo ${BUILDPATH}
-	    conda activate mlops2
+	    conda init
+	    
             '''
         }
 
@@ -52,7 +53,7 @@ pipeline {
             echo "Installing Requirements"  
             source $WORKSPACE/miniconda/etc/profile.d/conda.sh
             
-
+	    conda activate mlops2
             export PATH="$HOME/.local/bin:$PATH"
             echo $PATH
             
