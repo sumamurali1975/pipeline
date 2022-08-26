@@ -40,7 +40,6 @@ pipeline {
             conda create --name mlops2
             
             echo ${BUILDPATH}
-	    conda init
 	    
             '''
         }
@@ -61,7 +60,6 @@ pipeline {
             pip install -U databricks-connect
 	    
             pip install -r requirements.txt
-	    #cat requirements.txt
             databricks --version
 
            '''
