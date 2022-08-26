@@ -130,7 +130,8 @@ pipeline {
             try {
               sh """#!/bin/bash
                 source $WORKSPACE/miniconda/etc/profile.d/conda.sh
-                #conda activate mlops2
+                conda activate mlops2
+		conda list
 
                 # Python tests for libs
                 python -m pytest --junit-xml=${TESTRESULTPATH}/TEST-libout.xml ${LIBRARYPATH}/python/dbxdemo/test*.py || true
