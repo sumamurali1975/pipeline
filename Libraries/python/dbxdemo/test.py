@@ -1,11 +1,7 @@
-from testbook import testbook
-import pytest
+# test.py
 
-@testbook("/notebooks.ipynb", execute=0)
-def test_output(tb):
-    assert tb.cell_output_text(0) == "hello world"
+def capital_case(x):
+    return x.capitalize()
 
-@testbook("/notebooks.ipynb", execute=True)
-def test_add(tb):
-    add = tb.get("add")
-    assert add(1, 2) == 3
+def test_capital_case():
+    assert capital_case('semaphore') == 'Semaphore'
