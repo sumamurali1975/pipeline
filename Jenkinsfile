@@ -103,7 +103,7 @@ pipeline {
               # Generate artifact
               #tar -czvf Builds/latest_build.tar.gz ${BUILDPATH}
            """
-	      slackSend color: '#BADA55', message: 'Pipeline Build Artifact Done'
+	      slackSend "Build Artifact - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
         }
 
     }
