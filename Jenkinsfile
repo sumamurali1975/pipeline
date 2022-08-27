@@ -87,44 +87,8 @@ pipeline {
 		  }
 		}
 	}
-    stage('Build Artifact') {
-        steps {
-            sh """mkdir -p "${BUILDPATH}/Workspace"
-	      mkdir -p "${BUILDPATH}/Workspace/Notebooks-tests"
-              mkdir -p "${BUILDPATH}/Libraries/python"
-              mkdir -p "${BUILDPATH}/Validation/Output"
-              
-              cp ${WORKSPACE}/Notebooks/*.ipynb ${BUILDPATH}/Workspace
-	      cp ${WORKSPACE}/Notebooks-tests/*.py ${BUILDPATH}/Workspace/Notebooks-tests
     
-              # Get packaged libs
-              find ${LIBRARYPATH} -name '*.whl' | xargs -I '{}' cp '{}' ${BUILDPATH}/Libraries/python/
-
-              # Generate artifact
-              #tar -czvf Builds/latest_build.tar.gz ${BUILDPATH}
-           """
-	      slackSend failOnError: true, color: "#439FE0", message: "Build Started: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
-        }
-
-    }
-    stage('Databricks Deploy') {
-          steps { 
-            withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) {        
-              sh """#!/bin/bash
-                source $WORKSPACE/miniconda/etc/profile.d/conda.sh
-                conda activate mlops2
-                export PATH="$HOME/.local/bin:$PATH"
-
-
-                # Use Databricks CLI to deploy notebooks
-		databricks workspace mkdirs ${WORKSPACEPATH}
-                databricks workspace import_dir --overwrite ${BUILDPATH}/Workspace ${WORKSPACEPATH}
-                dbfs cp -r ${BUILDPATH}/Libraries/python ${DBFSPATH}
-                """
-		     slackSend color: '#BADA55', message:'Pipeline Databricks Deploy Done'
-            }
-          }
-    }
+    
    
 
    
@@ -150,7 +114,26 @@ pipeline {
         }
       }
     }
+stage('Build Artifact') {
+        steps {
+            sh """mkdir -p "${BUILDPATH}/Workspace"
+	      mkdir -p "${BUILDPATH}/Workspace/Notebooks-tests"
+              mkdir -p "${BUILDPATH}/Libraries/python"
+              mkdir -p "${BUILDPATH}/Validation/Output"
+              
+              cp ${WORKSPACE}/Notebooks/*.ipynb ${BUILDPATH}/Workspace
+	      cp ${WORKSPACE}/Notebooks-tests/*.py ${BUILDPATH}/Workspace/Notebooks-tests
+    
+              # Get packaged libs
+              find ${LIBRARYPATH} -name '*.whl' | xargs -I '{}' cp '{}' ${BUILDPATH}/Libraries/python/
 
+              # Generate artifact
+              #tar -czvf Builds/latest_build.tar.gz ${BUILDPATH}
+           """
+	      slackSend failOnError: true, color: "#439FE0", message: "Build Started: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+        }
+
+    }
 stage('build && SonarQube analysis') {
           steps {
             //def scannerhome = tool name: 'SonarQubeScanner'
@@ -165,7 +148,24 @@ stage('build && SonarQube analysis') {
 		
         }
         }
+stage('Databricks Deploy') {
+          steps { 
+            withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) {        
+              sh """#!/bin/bash
+                source $WORKSPACE/miniconda/etc/profile.d/conda.sh
+                conda activate mlops2
+                export PATH="$HOME/.local/bin:$PATH"
 
+
+                # Use Databricks CLI to deploy notebooks
+		databricks workspace mkdirs ${WORKSPACEPATH}
+                databricks workspace import_dir --overwrite ${BUILDPATH}/Workspace ${WORKSPACEPATH}
+                dbfs cp -r ${BUILDPATH}/Libraries/python ${DBFSPATH}
+                """
+		     slackSend color: '#BADA55', message:'Pipeline Databricks Deploy Done'
+            }
+          }
+    }
   } 
 }
 
