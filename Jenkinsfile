@@ -109,10 +109,10 @@ pipeline {
         }
       }
     }
-	stage('Build Artifact') {
-        steps {
-            sh """mkdir -p "${BUILDPATH}/Workspace"
-	      mkdir -p "${BUILDPATH}/Workspace/Notebooks-tests"
+   stage('Build Artifact') {
+	   steps {
+              sh """mkdir -p "${BUILDPATH}/Workspace"
+			  mkdir -p "${BUILDPATH}/Workspace/Notebooks-tests"
               mkdir -p "${BUILDPATH}/Libraries/python"
               mkdir -p "${BUILDPATH}/Validation/Output"
               
