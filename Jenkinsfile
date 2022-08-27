@@ -117,20 +117,20 @@ pipeline {
 stage('Build Artifact') {
         steps {
             sh """mkdir -p "${BUILDPATH}/Workspace"
-	      mkdir -p "${BUILDPATH}/Workspace/Notebooks-tests"
-              mkdir -p "${BUILDPATH}/Libraries/python"
-              mkdir -p "${BUILDPATH}/Validation/Output"
+	              mkdir -p "${BUILDPATH}/Workspace/Notebooks-tests"
+                  mkdir -p "${BUILDPATH}/Libraries/python"
+                  mkdir -p "${BUILDPATH}/Validation/Output"
               
-              cp ${WORKSPACE}/Notebooks/*.ipynb ${BUILDPATH}/Workspace
-	      cp ${WORKSPACE}/Notebooks-tests/*.py ${BUILDPATH}/Workspace/Notebooks-tests
+                  cp ${WORKSPACE}/Notebooks/*.ipynb ${BUILDPATH}/Workspace
+	              cp ${WORKSPACE}/Notebooks-tests/*.py ${BUILDPATH}/Workspace/Notebooks-tests
     
-              # Get packaged libs
-              find ${LIBRARYPATH} -name '*.whl' | xargs -I '{}' cp '{}' ${BUILDPATH}/Libraries/python/
+                  # Get packaged libs
+                  find ${LIBRARYPATH} -name '*.whl' | xargs -I '{}' cp '{}' ${BUILDPATH}/Libraries/python/
 
-              # Generate artifact
-              #tar -czvf Builds/latest_build.tar.gz ${BUILDPATH}
-           """
-	      slackSend failOnError: true, color: "#439FE0", message: "Build Started: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+                  # Generate artifact
+                  #tar -czvf Builds/latest_build.tar.gz ${BUILDPATH}
+                """
+	        slackSend failOnError: true, color: "#439FE0", message: "Build Started: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
         }
 
     }
@@ -142,7 +142,7 @@ stage('build && SonarQube analysis') {
             withSonarQubeEnv('sonar') {
                      sh "/opt/sonar-scanner/bin/sonar-scanner -Dsonar.projectKey=demo-project -Dsonar.projectVersion=0.0.3 -Dsonar.sources=${BUILDPATH} -Dsonar.host.url=http://107.20.71.233:9001 -Dsonar.login=ab9d8f9c15baff5428b9bf18b0ec198a5b35c6bb -Dsonar.python.coverage.reportPaths=coverage.xml -Dsonar.sonar.inclusions=**/*.ipynb -Dsonar.exclusions=**/*.ini,**/*.py,**./*.sh"
 	   
-	    slackSend color: '#BADA55', message: 'Pipeline SonarQube analysis Done', timestamp :''
+	                 slackSend color: '#BADA55', message: 'Pipeline SonarQube analysis Done', timestamp :''
 	      }
               }
 		
@@ -158,13 +158,11 @@ stage('Databricks Deploy') {
 
 
                 # Use Databricks CLI to deploy notebooks
-		databricks workspace mkdirs ${WORKSPACEPATH}
+		        databricks workspace mkdirs ${WORKSPACEPATH}
                 databricks workspace import_dir --overwrite ${BUILDPATH}/Workspace ${WORKSPACEPATH}
                 dbfs cp -r ${BUILDPATH}/Libraries/python ${DBFSPATH}
                 """
-		     
-		slackSend color: '#BADA55', message: 'Pipeline Databricks Deploy Done', timestamp :''
-		slackSend color: '#FF0000', message:'Pipeline Deployement Finished'
+		      slackSend color: '#BADA55', message:'Pipeline Databricks Deploy Done'
             }
           }
     }
