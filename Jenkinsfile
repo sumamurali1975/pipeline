@@ -103,7 +103,7 @@ pipeline {
               # Generate artifact
               #tar -czvf Builds/latest_build.tar.gz ${BUILDPATH}
            """
-	      slackSend failOnError: true color: "#439FE0", message: "Build Started: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+	      slackSend failOnError: true, color: "#439FE0", message: "Build Started: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
         }
 
     }
@@ -163,7 +163,7 @@ stage('build && SonarQube analysis') {
               }
 		  post {
             success {
-                slackSend failOnError: true color: '#BADA55', message:"Build deployed successfully - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+                slackSend failOnError: true, color: '#BADA55', message:"Build deployed successfully - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
             }
         }
         }
