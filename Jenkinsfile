@@ -109,10 +109,10 @@ pipeline {
         }
       }
     }
-   stage('Build Artifact') {
-	   steps {
-              sh """mkdir -p "${BUILDPATH}/Workspace"
-			  mkdir -p "${BUILDPATH}/Workspace/Notebooks-tests"
+      stage('Build Artifact') {
+        steps {
+            sh """mkdir -p "${BUILDPATH}/Workspace"
+	      mkdir -p "${BUILDPATH}/Workspace/Notebooks-tests"
               mkdir -p "${BUILDPATH}/Libraries/python"
               mkdir -p "${BUILDPATH}/Validation/Output"
               
@@ -127,6 +127,8 @@ pipeline {
            """
 	      slackSend failOnError: true, color: "#439FE0", message: "Build Started: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
         }
+
+    }
     stage('SonarQube analysis') {
           steps {
             //def scannerhome = tool name: 'SonarQubeScanner'
@@ -137,7 +139,26 @@ pipeline {
 	   
 	    slackSend color: '#BADA55', message: 'Pipeline SonarQube analysis Done', timestamp :''
 	      }
-              }
+              }   stage('Build Artifact') {
+        steps {
+            sh """mkdir -p "${BUILDPATH}/Workspace"
+	      mkdir -p "${BUILDPATH}/Workspace/Notebooks-tests"
+              mkdir -p "${BUILDPATH}/Libraries/python"
+              mkdir -p "${BUILDPATH}/Validation/Output"
+              
+              cp ${WORKSPACE}/Notebooks/*.ipynb ${BUILDPATH}/Workspace
+	      cp ${WORKSPACE}/Notebooks-tests/*.py ${BUILDPATH}/Workspace/Notebooks-tests
+    
+              # Get packaged libs
+              find ${LIBRARYPATH} -name '*.whl' | xargs -I '{}' cp '{}' ${BUILDPATH}/Libraries/python/
+
+              # Generate artifact
+              #tar -czvf Builds/latest_build.tar.gz ${BUILDPATH}
+           """
+	      slackSend failOnError: true, color: "#439FE0", message: "Build Started: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+        }
+
+    }
 		
         }
         }
