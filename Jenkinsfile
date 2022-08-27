@@ -161,6 +161,11 @@ stage('build && SonarQube analysis') {
 		   slackSend color: '#BADA55', message: 'Pipeline SonarQube analysis Done'  
 	      }
               }
+		  post {
+            success {
+                slackSend failOnError: true color: '#BADA55', message:"Build deployed successfully - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+            }
+        }
         }
         }
 
