@@ -163,7 +163,7 @@ stage('Databricks Deploy') {
                 dbfs cp -r ${BUILDPATH}/Libraries/python ${DBFSPATH}
                 """
 		      slackSend color: '#BADA55', message:'Pipeline Databricks Deploy Done'
-		      slackSend color: '#FF0000', message:' Databricks Pipeline Deployment Finished', iconEmoji: "white_check_mark"
+		      slackSend color: '#FF0000', message:' Databricks Pipeline Deployment Finished', iconEmoji: ":white_check_mark:"
             }
           }
     }
