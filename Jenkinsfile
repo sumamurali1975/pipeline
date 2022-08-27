@@ -170,4 +170,5 @@ stage('build && SonarQube analysis') {
 
 def notifySuccessful(){
 slackSend (color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+slackSend color: '#BADA55', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
 }
