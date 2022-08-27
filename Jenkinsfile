@@ -162,7 +162,7 @@ stage('Databricks Deploy') {
                 databricks workspace import_dir --overwrite ${BUILDPATH}/Workspace ${WORKSPACEPATH}
                 dbfs cp -r ${BUILDPATH}/Libraries/python ${DBFSPATH}
                 """
-		     slackSend color: '#BADA55', message:'Pipeline Databricks Deploy Done'
+		     slackSend color: '#FF0000', message:'Pipeline Databricks Deploy Done'
             }
           }
     }
