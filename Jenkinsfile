@@ -13,7 +13,7 @@ pipeline {
     LIBRARYPATH     = "./Libraries"
     OUTFILEPATH     = "./Validation/Output"
     NOTEBOOKPATH    = "./Notebooks"
-    WORKSPACEPATH   = "/Users/subho.majumdar@ibm.com/Demo-notebooks"               //"/Shared"
+    WORKSPACEPATH   = "/Demo-notebooks"               //"/Shared"
     DBFSPATH        = "dbfs:/FileStore/"
     BUILDPATH       = "${WORKSPACE}/Builds/${env.JOB_NAME}-${env.BUILD_NUMBER}"
     SCRIPTPATH      = "./Scripts"
@@ -122,7 +122,7 @@ stage('Build Artifact') {
                   mkdir -p "${BUILDPATH}/Validation/Output"
               
                   cp ${WORKSPACE}/Notebooks/*.ipynb ${BUILDPATH}/Workspace
-	              cp ${WORKSPACE}/Notebooks-tests/*.py ${BUILDPATH}/Workspace/Notebooks-tests
+	          cp ${WORKSPACE}/Notebooks-tests/*.py ${BUILDPATH}/Workspace/Notebooks-tests
     
                   # Get packaged libs
                   find ${LIBRARYPATH} -name '*.whl' | xargs -I '{}' cp '{}' ${BUILDPATH}/Libraries/python/
@@ -158,7 +158,7 @@ stage('Databricks Deploy') {
 
 
                 # Use Databricks CLI to deploy notebooks
-		        databricks workspace mkdirs ${WORKSPACEPATH}
+		databricks workspace mkdirs ${WORKSPACEPATH}
                 databricks workspace import_dir --overwrite ${BUILDPATH}/Workspace ${WORKSPACEPATH}
                 dbfs cp -r ${BUILDPATH}/Libraries/python ${DBFSPATH}
                 """
