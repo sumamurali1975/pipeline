@@ -164,22 +164,16 @@ stage('Databricks Deploy') {
     }
 stage('Publish SNS') {
          steps {
-		 step{
-			 try{  
-			    echo 'Publishing SNS message to AWS'
-			    echo "${WORKSPACE}/Builds/${env.JOB_NAME}-${env.BUILD_NUMBER}"
-
-			    withAWS(credentials:'AWSCredentialsForSnsPublish') {
-				snsPublish(
-				    topicArn:'arn:aws:sns:us-east-1:872161624847:mdlp-build-status-topic', 
-				    subject:"Job:${env.JOB_NAME}-Build Number:${env.BUILD_NUMBER} is ${currentBuild.currentResult}", 
-				    message: "Please note that Jenkins job:${env.JOB_NAME} of build number:${currentBuild.number} is - ${currentBuild.currentResult}"
-				)
-			    }
-			 }catch(err){
-			    echo 'Failed in Publish SNS stage'
-			 }
-		 }
+            echo 'Publishing SNS message to AWS'
+            echo "${WORKSPACE}/Builds/${env.JOB_NAME}-${env.BUILD_NUMBER}"
+            
+            withAWS(credentials:'AWSCredentialsForSnsPublish') {
+                snsPublish(
+                    topicArn:'arn:aws:sns:us-east-1:872161624847:mdlp-build-status-topic', 
+                    subject:"Job:${env.JOB_NAME}-Build Number:${env.BUILD_NUMBER} is ${currentBuild.currentResult}", 
+                    message: "Please note that Jenkins job:${env.JOB_NAME} of build number:${currentBuild.number} is - ${currentBuild.currentResult}"
+                )
+            }            
          }
       }
   } 
