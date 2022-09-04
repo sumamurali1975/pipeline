@@ -69,36 +69,21 @@ pipeline {
     
     stage('Databricks Setup') {
 		steps{
-			  boolean continuePipeline = true
 			  withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) {
-				  try{
-					sh """#!/bin/bash
-					# Configure Databricks CLI for deployment
-					echo "${DBURL}
-					$TOKEN" | databricks configure --token
-					# Configure Databricks Connect for testing
-					echo "${DBURL}
-					$TOKEN
-					${CLUSTERID}
-					0
-					15001" | databricks-connect configure
-					echo "list the workspace and below are the notebooks:"
-					databricks workspace ls /Users/emmanuel.mua@ibm.com
-					"""
-				  }catch(err){
-					  continuePipeline = false
-				  }
-			  }
-			if(!continuePipeline){
-				withAWS(credentials:'AWSCredentialsForSnsPublish') {
-				snsPublish(
-				    topicArn:'arn:aws:sns:us-east-1:872161624847:mdlp-build-status-topic', 
-				    subject:"Job:${env.JOB_NAME}-Build Number:${env.BUILD_NUMBER} is ${currentBuild.currentResult}", 
-				    message: "Please note that Jenkins job:${env.JOB_NAME} of build number:${currentBuild.number} is - ${currentBuild.currentResult}"
-				)
-			    }
-			}
-			
+				sh """#!/bin/bash
+				# Configure Databricks CLI for deployment
+				echo "${DBURL}
+				$TOKEN" | databricks configure --token
+				# Configure Databricks Connect for testing
+				echo "${DBURL}
+				$TOKEN
+				${CLUSTERID}
+				0
+				15001" | databricks-connect configure
+				echo "list the workspace and below are the notebooks:"
+				databricks workspace ls /Users/emmanuel.mua@ibm.com
+				"""
+			  }	
 		}
 	}
    
