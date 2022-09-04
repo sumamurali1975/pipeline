@@ -176,7 +176,27 @@ stage('Publish SNS') {
             }            
          }
       }
-  } 
+  }
+  post {
+		success {
+		  withAWS(credentials:'AWSCredentialsForSnsPublish') {
+				snsPublish(
+					topicArn:'arn:aws:sns:us-east-1:872161624847:mdlp-build-status-topic', 
+					subject:"Job:${env.JOB_NAME}-Build Number:${env.BUILD_NUMBER} is ${currentBuild.currentResult}", 
+					message: "Please note that Jenkins job:${env.JOB_NAME} of build number:${currentBuild.number} is - ${currentBuild.currentResult}"
+				)
+			}
+		}
+		failure {
+		  withAWS(credentials:'AWSCredentialsForSnsPublish') {
+				snsPublish(
+					topicArn:'arn:aws:sns:us-east-1:872161624847:mdlp-build-status-topic', 
+					subject:"Job:${env.JOB_NAME}-Build Number:${env.BUILD_NUMBER} is ${currentBuild.currentResult}", 
+					message: "Please note that Jenkins job:${env.JOB_NAME} of build number:${currentBuild.number} is - ${currentBuild.currentResult}"
+				)
+			}
+		}
+  }
 }
 
 
