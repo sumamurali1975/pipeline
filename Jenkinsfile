@@ -7,7 +7,7 @@ pipeline {
     //DBRKS_BEARER_TOKEN  = "xyz"
     DBTOKEN             = "databricks-token"
     CLUSTERID           = "AWS-Glue Catalogue Cluster"
-    DBURL               = "https://abc-db420c65-4456.cloud.databricks.com"
+    DBURL               = "https://dbc-db420c65-4456.cloud.databricks.com"
 
     TESTRESULTPATH  ="./teste_results"
     LIBRARYPATH     = "./Libraries"
@@ -168,8 +168,8 @@ stage('Databricks Deploy') {
 		  withAWS(credentials:'AWSCredentialsForSnsPublish') {
 				snsPublish(
 					topicArn:'arn:aws:sns:us-east-1:872161624847:mdlp-build-status-topic', 
-					subject:"Job:${env.JOB_NAME}-Build Number:${env.BUILD_NUMBER} is ${currentBuild.currentResult}", 
-					message: "Please note that Jenkins job:${env.JOB_NAME} of build number:${currentBuild.number} is - ${currentBuild.currentResult}"
+					subject:"Job:${env.JOB_NAME}-Build Number:${env.BUILD_NUMBER} is a ${currentBuild.currentResult}", 
+					message: "Please note that for Jenkins job:${env.JOB_NAME} of build number:${currentBuild.number} - ${currentBuild.currentResult} happened!"
 				)
 			}
 		}
@@ -177,8 +177,8 @@ stage('Databricks Deploy') {
 		  withAWS(credentials:'AWSCredentialsForSnsPublish') {
 				snsPublish(
 					topicArn:'arn:aws:sns:us-east-1:872161624847:mdlp-build-status-topic', 
-					subject:"Job:${env.JOB_NAME}-Build Number:${env.BUILD_NUMBER} is ${currentBuild.currentResult}", 
-					message: "Please note that Jenkins job:${env.JOB_NAME} of build number:${currentBuild.number} is - ${currentBuild.currentResult}"
+					subject:"Job:${env.JOB_NAME}-Build Number:${env.BUILD_NUMBER} is a ${currentBuild.currentResult}", 
+					message: "Please note that for Jenkins job:${env.JOB_NAME} of build number:${currentBuild.number} - ${currentBuild.currentResult} happened!"
 				)
 			}
 		}
