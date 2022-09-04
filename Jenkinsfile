@@ -7,7 +7,7 @@ pipeline {
     //DBRKS_BEARER_TOKEN  = "xyz"
     DBTOKEN             = "databricks-token"
     CLUSTERID           = "AWS-Glue Catalogue Cluster"
-    DBURL               = "https://dbc-db420c65-4456.cloud.databricks.com"
+    DBURL               = "https://abc-db420c65-4456.cloud.databricks.com"
 
     TESTRESULTPATH  ="./teste_results"
     LIBRARYPATH     = "./Libraries"
