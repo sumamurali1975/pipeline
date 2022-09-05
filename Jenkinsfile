@@ -112,6 +112,19 @@ stage('Unit Tests') {
       }
     }
 	  
+stage('Package') {
+  sh """#!/bin/bash
+      # Enable Conda environment for tests
+      source $WORKSPACE/miniconda/etc/profile.d/conda.sh
+      conda activate mlops2
+      conda list
+
+      # Package Python library to wheel
+      cd ${LIBRARYPATH}/python/dbxdemo
+      python3 setup.py sdist bdist_wheel
+     """
+}
+	  
 stage('Build Artifact') {
         steps {
             sh """mkdir -p "${BUILDPATH}/Workspace"
