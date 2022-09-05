@@ -3,7 +3,7 @@ import pytest
 
 
 from spark import get_spark
-from appendcol import with_status
+from addcol import with_status
 
 
 class TestAppendCol(object):
