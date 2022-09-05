@@ -98,6 +98,13 @@ stage('Unit Tests') {
                 source $WORKSPACE/miniconda/etc/profile.d/conda.sh
                 conda activate mlops2
 		conda list
+		
+		# Configure Databricks Connect for testing
+		echo "${DBURL}
+		$TOKEN
+		${CLUSTERID}
+		0
+		15001" | databricks-connect configure
 
                 # Python tests
                 python3 -m pytest -v --junit-xml=${TESTRESULTPATH}/TEST-libout.xml ${LIBRARYPATH}/python/dbxdemo/test*.py || true
