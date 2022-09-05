@@ -94,14 +94,21 @@ stage('Unit Tests') {
 
         script {
             try {
-              sh """#!/bin/bash
-                source $WORKSPACE/miniconda/etc/profile.d/conda.sh
-                conda activate mlops2
-		conda list
-
-                # Python tests
-                python3 -m pytest -v --junit-xml=${TESTRESULTPATH}/TEST-libout.xml ${LIBRARYPATH}/python/dbxdemo/test*.py || true
-                """
+		 withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) {   
+		      sh """#!/bin/bash
+			source $WORKSPACE/miniconda/etc/profile.d/conda.sh
+			conda activate mlops2
+			conda list
+			# Configure Databricks Connect for testing
+			echo "${DBURL}
+			$TOKEN
+			${CLUSTERID}
+			0
+			15001" | databricks-connect configure
+			# Python tests
+			python3 -m pytest -v --junit-xml=${TESTRESULTPATH}/TEST-libout.xml ${LIBRARYPATH}/python/dbxdemo/test*.py || true
+			"""
+		 }
           } catch(err) {
             step([$class: 'JUnitResultArchiver', testResults: '--junit-xml=${TESTRESULTPATH}/TEST-*.xml'])
             if (currentBuild.result == 'UNSTABLE')
