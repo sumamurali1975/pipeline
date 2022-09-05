@@ -84,6 +84,8 @@ stage('Databricks Setup') {
 			${CLUSTERID}
 			0
 			15001" | databricks-connect configure
+			# Python tests
+                	python3 -m pytest -v --junit-xml=${TESTRESULTPATH}/TEST-libout.xml ${LIBRARYPATH}/python/dbxdemo/test*.py || true
 			"""
 		  }	
 	}
@@ -100,7 +102,7 @@ stage('Unit Tests') {
 		conda list
 
                 # Python tests
-                python3 -m pytest -v --junit-xml=${TESTRESULTPATH}/TEST-libout.xml ${LIBRARYPATH}/python/dbxdemo/test*.py || true
+                #python3 -m pytest -v --junit-xml=${TESTRESULTPATH}/TEST-libout.xml ${LIBRARYPATH}/python/dbxdemo/test*.py || true
                 """
           } catch(err) {
             step([$class: 'JUnitResultArchiver', testResults: '--junit-xml=${TESTRESULTPATH}/TEST-*.xml'])
