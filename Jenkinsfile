@@ -122,6 +122,7 @@ stage('Package') {
 
 	      # Package Python library to wheel
 	      cd ${LIBRARYPATH}/python/dbxdemo
+	      pip install wheel
 	      python3 setup.py sdist bdist_wheel
 	     """
      }
