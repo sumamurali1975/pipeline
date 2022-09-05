@@ -19,7 +19,7 @@ pipeline {
     SCRIPTPATH      = "./Scripts"
     projectName = "${WORKSPACE}"  //var/lib/jenkins/workspace/Demopipeline/
     projectKey = "key"
-      }
+ }
 
   stages {
     stage('Install Miniconda') {
@@ -66,6 +66,28 @@ pipeline {
         }
 
     }
+	  
+stage('Databricks Setup') {
+	steps{
+		  withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) {
+			sh """#!/bin/bash
+			#Configure conda environment
+			conda activate mlops2
+			export PATH="$HOME/.local/bin:$PATH"
+			echo $PATH
+			# Configure Databricks CLI for deployment
+			echo "${DBURL}
+			$TOKEN" | databricks configure --token
+			# Configure Databricks Connect for testing
+			echo "${DBURL}
+			$TOKEN
+			${CLUSTERID}
+			0
+			15001" | databricks-connect configure
+			"""
+		  }	
+	}
+}
 
 stage('Unit Tests') {
       steps {
@@ -125,26 +147,6 @@ stage('SonarQube analysis') {
 		
         }
         }
-    
-    stage('Databricks Setup') {
-		steps{
-			  withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) {
-				sh """#!/bin/bash
-				# Configure Databricks CLI for deployment
-				echo "${DBURL}
-				$TOKEN" | databricks configure --token
-				# Configure Databricks Connect for testing
-				echo "${DBURL}
-				$TOKEN
-				${CLUSTERID}
-				0
-				15001" | databricks-connect configure
-				echo "list the workspace and below are the notebooks:"
-				databricks workspace ls /Users/emmanuel.mua@ibm.com
-				"""
-			  }	
-		}
-	}
    
 stage('Databricks Deploy') {
           steps { 
