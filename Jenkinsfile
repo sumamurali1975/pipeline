@@ -55,9 +55,6 @@ pipeline {
 	    conda activate mlops2
             export PATH="$HOME/.local/bin:$PATH"
             echo $PATH
-            
-            pip install --user databricks-cli
-            pip install -U databricks-connect
 	    
             pip install -r requirements.txt requirements-test.txt
             databricks --version
