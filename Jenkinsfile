@@ -79,7 +79,6 @@ stage('Unit Tests') {
 
                 # Python tests
                 python3 -m pytest -v --junit-xml=${TESTRESULTPATH}/TEST-libout.xml ${BUILDPATH}/Workspace/Notebooks-tests/test*.py || true
-		python3 -m pytest -v --junit-xml=${TESTRESULTPATH}/TESTIPYNB-libout.xml --nbmake -n=auto "${BUILDPATH}/Workspace/Notebooks-tests/test*.ipynb" || true
                 """
           } catch(err) {
             step([$class: 'JUnitResultArchiver', testResults: '--junit-xml=${TESTRESULTPATH}/TEST-*.xml'])
