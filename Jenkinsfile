@@ -138,12 +138,10 @@ stage('Package') {
 stage('Build Artifact') {
         steps {
             sh """mkdir -p "${BUILDPATH}/Workspace"
-	              mkdir -p "${BUILDPATH}/Workspace/Notebooks-tests"
                   mkdir -p "${BUILDPATH}/Libraries/python"
                   mkdir -p "${BUILDPATH}/Validation/Output"
               
                   cp ${WORKSPACE}/Notebooks/*.ipynb ${BUILDPATH}/Workspace
-	          cp ${WORKSPACE}/Notebooks-tests/*.py ${BUILDPATH}/Workspace/Notebooks-tests
     
                   # Get packaged libs
                   find ${LIBRARYPATH} -name '*.whl' | xargs -I '{}' cp '{}' ${BUILDPATH}/Libraries/python/
