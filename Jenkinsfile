@@ -104,7 +104,7 @@ stage('Unit Tests') {
 			$TOKEN
 			${CLUSTERID}
 			0
-			15001" | databricks-connect configure
+			15001" | databricks-connect test
 			# Python tests
 			python3 -m pytest -v --junit-xml=${TESTRESULTPATH}/TEST-libout.xml ${LIBRARYPATH}/python/dbxdemo/test*.py || true
 			"""
@@ -112,7 +112,6 @@ stage('Unit Tests') {
           } catch(err) {
             step([$class: 'JUnitResultArchiver', testResults: '--junit-xml=${TESTRESULTPATH}/TEST-*.xml'])
             if (currentBuild.result == 'UNSTABLE')
-	      echo currentBuild.result
               currentBuild.result = 'FAILURE'
             throw err
           }
