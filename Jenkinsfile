@@ -99,7 +99,6 @@ stage('Unit Tests') {
 			source $WORKSPACE/miniconda/etc/profile.d/conda.sh
 			conda activate mlops2
 			conda list
-			DEBUG_IGNORE_VERSION_MISMATCH=1
 			# Configure Databricks Connect for testing
 			echo "${DBURL}
 			$TOKEN
