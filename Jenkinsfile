@@ -100,7 +100,6 @@ stage('Unit Tests') {
 			conda activate mlops2
 			conda list
 			# Configure Databricks Connect for testing
-			export PYSPARK_SUBMIT_ARGS="--master local[2] pyspark-shell"
 			echo "${DBURL}
 			$TOKEN
 			${CLUSTERID}
