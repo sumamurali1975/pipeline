@@ -59,7 +59,7 @@ pipeline {
 	    # pip install --user databricks-cli
             # pip install -U databricks-connect
 	    
-            pip install -r requirements.txt requirements-test.txt
+            pip install -r requirements.txt
             databricks --version
 
            '''
