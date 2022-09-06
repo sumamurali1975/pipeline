@@ -112,6 +112,7 @@ stage('Unit Tests') {
           } catch(err) {
             step([$class: 'JUnitResultArchiver', testResults: '--junit-xml=${TESTRESULTPATH}/TEST-*.xml'])
             if (currentBuild.result == 'UNSTABLE')
+	      echo currentBuild.result
               currentBuild.result = 'FAILURE'
             throw err
           }
