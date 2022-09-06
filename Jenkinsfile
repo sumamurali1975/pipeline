@@ -140,15 +140,18 @@ stage('Build Artifact') {
             sh """mkdir -p "${BUILDPATH}/Workspace"
                   mkdir -p "${BUILDPATH}/Libraries/python"
                   mkdir -p "${BUILDPATH}/Validation/Output"
-              
-                  cp ${WORKSPACE}/Notebooks/*.ipynb ${BUILDPATH}/Workspace
+              	  #Get Modified Files
+        	  git diff --name-only --diff-filter=AMR HEAD^1 HEAD | xargs -I '{}' cp --parents -r '{}' ${BUILDPATH}
+                  
+		  #cp ${WORKSPACE}/Notebooks/*.ipynb ${BUILDPATH}/Workspace
     
                   # Get packaged libs
                   find ${LIBRARYPATH} -name '*.whl' | xargs -I '{}' cp '{}' ${BUILDPATH}/Libraries/python/
 
                   # Generate artifact
-                  #tar -czvf Builds/latest_build.tar.gz ${BUILDPATH}
+                  tar -czvf Builds/latest_build.tar.gz ${BUILDPATH}
                 """
+		archiveArtifacts artifacts: 'Builds/latest_build.tar.gz'
 	        slackSend failOnError: true, color: "#439FE0", message: "Build Started: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
         }
 
