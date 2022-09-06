@@ -96,9 +96,12 @@ stage('Unit Tests') {
             try {
 		 withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) {   
 		      sh """#!/bin/bash
-			source $WORKSPACE/miniconda/etc/profile.d/conda.sh
 			conda activate mlops2
-			conda list
+			export PATH="$HOME/.local/bin:$PATH"
+			echo $PATH
+			# Configure Databricks CLI for deployment
+			echo "${DBURL}
+			$TOKEN" | databricks configure --token
 			# Configure Databricks Connect for testing
 			echo "${DBURL}
 			$TOKEN
