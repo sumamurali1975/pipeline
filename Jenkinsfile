@@ -99,6 +99,7 @@ stage('Unit Tests') {
 			source $WORKSPACE/miniconda/etc/profile.d/conda.sh
 			conda activate mlops2
 			conda list
+			databricks-connect -h
 			# Configure Databricks Connect for testing
 			echo "${DBURL}
 			$TOKEN
