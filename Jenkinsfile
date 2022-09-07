@@ -6,7 +6,7 @@ pipeline {
     //WORKSPACE           = '.'
     //DBRKS_BEARER_TOKEN  = "xyz"
     DBTOKEN             = "databricks-token"
-    CLUSTERID           = "AWS-Glue Catalogue Cluster"
+    CLUSTERID           = "0819-214501-chjkd9g9"
     DBURL               = "https://dbc-db420c65-4456.cloud.databricks.com"
 
     TESTRESULTPATH  ="./teste_results"
