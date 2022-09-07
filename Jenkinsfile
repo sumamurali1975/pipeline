@@ -67,132 +67,122 @@ pipeline {
 
     }
 	  
-stage('Databricks Setup') {
-	steps{
-		  withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) {
-			sh """#!/bin/bash
-			#Configure conda environment
-			conda activate mlops2
-			export PATH="$HOME/.local/bin:$PATH"
-			echo $PATH
-			# Configure Databricks CLI for deployment
-			echo "${DBURL}
-			$TOKEN" | databricks configure --token
-			# Configure Databricks Connect for testing
-			echo "${DBURL}
-			$TOKEN
-			${CLUSTERID}
-			0
-			15001" | databricks-connect configure
-			"""
-		  }	
+	stage('Databricks Setup') {
+		steps{
+			  withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) {
+				sh """#!/bin/bash
+				#Configure conda environment
+				conda activate mlops2
+				export PATH="$HOME/.local/bin:$PATH"
+				echo $PATH
+				# Configure Databricks CLI for deployment
+				echo "${DBURL}
+				$TOKEN" | databricks configure --token
+				# Configure Databricks Connect for testing
+				echo "${DBURL}
+				$TOKEN
+				${CLUSTERID}
+				0
+				15001" | databricks-connect configure
+				"""
+			  }	
+		}
 	}
-}
 
-stage('Unit Tests') {
-      steps {
+	stage('Unit Tests') {
+	      steps {
 
-        script {
-            try {
-		 withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) {   
-		      sh """#!/bin/bash
-			export PYSPARK_PYTHON=/usr/local/bin/python3.8
-			export PYSPARK_DRIVER_PYTHON=/usr/local/bin/python3.8
-			pyspark -v
-			# Python tests
-			python3.8 -m pytest --junit-xml=${TESTRESULTPATH}/TEST-libout.xml ${LIBRARYPATH}/python/dbxdemo/test*.py || true
-			"""
-		 }
-          } catch(err) {
-            step([$class: 'JUnitResultArchiver', testResults: '--junit-xml=${TESTRESULTPATH}/TEST-*.xml'])
-            if (currentBuild.result == 'UNSTABLE')
-              currentBuild.result = 'FAILURE'
-            throw err
-          }
-        }
-      }
-    }
-	  
-stage('Package') {
-     steps{
-	  sh """#!/bin/bash
-	      # Enable Conda environment for tests
-	      source $WORKSPACE/miniconda/etc/profile.d/conda.sh
-	      conda activate mlops2
-	      conda list
-
-	      # Package Python library to wheel
-	      cd ${LIBRARYPATH}/python/dbxdemo
-	      pip install wheel
-	      python3 setup.py sdist bdist_wheel
-	     """
-     }
-}
-	  
-stage('Build Artifact') {
-        steps {
-            sh """mkdir -p "${BUILDPATH}/Workspace"
-                  mkdir -p "${BUILDPATH}/Libraries/python"
-                  mkdir -p "${BUILDPATH}/Validation/Output"
-              	  #Get Modified Files
-        	  git diff --name-only --diff-filter=AMR HEAD^1 HEAD | xargs -I '{}' cp --parents -r '{}' ${BUILDPATH}
-                  
-		  #cp ${WORKSPACE}/Notebooks/*.ipynb ${BUILDPATH}/Workspace
-    
-                  # Get packaged libs
-                  find ${LIBRARYPATH} -name '*.whl' | xargs -I '{}' cp '{}' ${BUILDPATH}/Libraries/python/
-
-                  # Generate artifact
-                  #tar -czvf Builds/latest_build.tar.gz ${BUILDPATH}
-                """
-	        slackSend failOnError: true, color: "#439FE0", message: "Build Started: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
-        }
-
-    }
-	  
-stage('SonarQube analysis') {
-          steps {
-            //def scannerhome = tool name: 'SonarQubeScanner'
-
-            withEnv(["PATH=/usr/bin:/usr/local/jdk-11.0.2/bin:/opt/sonarqube/sonar-scanner/bin/"]) {
-            withSonarQubeEnv('sonar') {
-                     sh "/opt/sonar-scanner/bin/sonar-scanner -Dsonar.projectKey=demo-project -Dsonar.projectVersion=0.0.3 -Dsonar.sources=${BUILDPATH} -Dsonar.host.url=http://107.20.71.233:9001 -Dsonar.login=ab9d8f9c15baff5428b9bf18b0ec198a5b35c6bb -Dsonar.python.coverage.reportPaths=coverage.xml -Dsonar.sonar.inclusions=**/*.ipynb -Dsonar.exclusions=**/*.ini,**/*.py,**./*.sh"
-	   
-	                 slackSend color: '#BADA55', message: 'Pipeline SonarQube analysis Done', timestamp :''
+		script {
+		    try {
+			 withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) {   
+			      sh """#!/bin/bash
+				export PYSPARK_PYTHON=/usr/local/bin/python3.8
+				export PYSPARK_DRIVER_PYTHON=/usr/local/bin/python3.8
+				pyspark -v
+				# Python tests
+				python3.8 -m pytest --junit-xml=${TESTRESULTPATH}/TEST-libout.xml ${LIBRARYPATH}/python/dbxdemo/test*.py || true
+				"""
+			 }
+		  } catch(err) {
+		    step([$class: 'JUnitResultArchiver', testResults: '--junit-xml=${TESTRESULTPATH}/TEST-*.xml'])
+		    if (currentBuild.result == 'UNSTABLE')
+		      currentBuild.result = 'FAILURE'
+		    throw err
+		  }
+		}
 	      }
-              }
-		
-        }
+	    }
+	  
+	stage('Package') {
+	     steps{
+		  sh """#!/bin/bash
+		      # Enable Conda environment for tests
+		      source $WORKSPACE/miniconda/etc/profile.d/conda.sh
+		      conda activate mlops2
+		      conda list
+
+		      # Package Python library to wheel
+		      cd ${LIBRARYPATH}/python/dbxdemo
+		      pip install wheel
+		      python3 setup.py sdist bdist_wheel
+		     """
+	     }
+	}
+	  
+	stage('Build Artifact') {
+		steps {
+		    sh """mkdir -p "${BUILDPATH}/Workspace"
+			  mkdir -p "${BUILDPATH}/Libraries/python"
+			  mkdir -p "${BUILDPATH}/Validation/Output"
+			  #Get Modified Files
+			  git diff --name-only --diff-filter=AMR HEAD^1 HEAD | xargs -I '{}' cp --parents -r '{}' ${BUILDPATH}
+
+			  #cp ${WORKSPACE}/Notebooks/*.ipynb ${BUILDPATH}/Workspace
+
+			  # Get packaged libs
+			  find ${LIBRARYPATH} -name '*.whl' | xargs -I '{}' cp '{}' ${BUILDPATH}/Libraries/python/
+
+			  # Generate artifact
+			  #tar -czvf Builds/latest_build.tar.gz ${BUILDPATH}
+			"""
+			slackSend failOnError: true, color: "#439FE0", message: "Build Started: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+		}
+
+	    }
+	  
+	stage('SonarQube analysis') {
+		  steps {
+		    //def scannerhome = tool name: 'SonarQubeScanner'
+
+		    withEnv(["PATH=/usr/bin:/usr/local/jdk-11.0.2/bin:/opt/sonarqube/sonar-scanner/bin/"]) {
+			    withSonarQubeEnv('sonar') {
+				     sh "/opt/sonar-scanner/bin/sonar-scanner -Dsonar.projectKey=demo-project -Dsonar.projectVersion=0.0.3 -Dsonar.sources=${BUILDPATH} -Dsonar.host.url=http://107.20.71.233:9001 -Dsonar.login=ab9d8f9c15baff5428b9bf18b0ec198a5b35c6bb -Dsonar.python.coverage.reportPaths=coverage.xml -Dsonar.sonar.inclusions=**/*.ipynb -Dsonar.exclusions=**/*.ini,**/*.py,**./*.sh"
+
+					 slackSend color: '#BADA55', message: 'Pipeline SonarQube analysis Done', timestamp :''
+			      }
+		    }
+
+		}
         }
    
-stage('Databricks Deploy') {
-	 steps { 
-	    withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) {        
-	      sh """#!/bin/bash
-		source $WORKSPACE/miniconda/etc/profile.d/conda.sh
-		conda activate mlops2
-		export PATH="$HOME/.local/bin:$PATH"
+	stage('Databricks Deploy') {
+		 steps { 
+		    withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) {        
+		      sh """#!/bin/bash
+			source $WORKSPACE/miniconda/etc/profile.d/conda.sh
+			conda activate mlops2
+			export PATH="$HOME/.local/bin:$PATH"
 
 
-		# Use Databricks CLI to deploy notebooks
-		databricks workspace mkdirs ${WORKSPACEPATH}
-		databricks workspace import_dir --overwrite ${BUILDPATH}/Workspace ${WORKSPACEPATH}
-		dbfs cp -r ${BUILDPATH}/Libraries/python ${DBFSPATH}
-		"""
-		      slackSend color: '#BADA55', message:'Pipeline Databricks Deploy Done'
-		      slackSend color: '#FF0000', message:' Databricks Pipeline Deployment Finished', iconEmoji: ":white_check_mark:"
-	    }
-	 }
-}
-	  
-	stage('Report Test Results') {
-		steps{
-		  sh """#!/bin/bash
-			find ${OUTFILEPATH} -name '*.json' -exec gzip --verbose {} \\;
-			touch ${TESTRESULTPATH}/TEST-*.xml
-		     """
-		  junit "**/reports/junit/*.xml"
-		}
+			# Use Databricks CLI to deploy notebooks
+			databricks workspace mkdirs ${WORKSPACEPATH}
+			databricks workspace import_dir --overwrite ${BUILDPATH}/Workspace ${WORKSPACEPATH}
+			dbfs cp -r ${BUILDPATH}/Libraries/python ${DBFSPATH}
+			"""
+			      slackSend color: '#BADA55', message:'Pipeline Databricks Deploy Done'
+			      slackSend color: '#FF0000', message:' Databricks Pipeline Deployment Finished', iconEmoji: ":white_check_mark:"
+		    }
+		 }
 	}
 	  
   }
