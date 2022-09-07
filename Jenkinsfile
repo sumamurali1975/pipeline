@@ -96,8 +96,8 @@ stage('Unit Tests') {
             try {
 		 withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) {   
 		      sh """#!/bin/bash
-			export PYSPARK_PYTHON = /usr/local/bin/python3.8
-			export PYSPARK_DRIVER_PYTHON = /usr/local/bin/python3.8
+			export PYSPARK_PYTHON=/usr/local/bin/python3.8
+			export PYSPARK_DRIVER_PYTHON=/usr/local/bin/python3.8
 			pyspark -v
 			# Python tests
 			python3.8 -m pytest --junit-xml=${TESTRESULTPATH}/TEST-libout.xml ${LIBRARYPATH}/python/dbxdemo/test*.py || true
