@@ -185,15 +185,6 @@ stage('Databricks Deploy') {
           }
     }
   }
-
-stage('Report Test Results') {
-	steps{
-	  sh """find ${OUTFILEPATH} -name '*.json' -exec gzip --verbose {} \\;
-		touch ${TESTRESULTPATH}/TEST-*.xml
-	     """
-	  junit "**/reports/junit/*.xml"
-	}
-}
 	
   post {
 		success {
