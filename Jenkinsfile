@@ -145,7 +145,6 @@ stage('Build Artifact') {
                   # Generate artifact
                   #tar -czvf Builds/latest_build.tar.gz ${BUILDPATH}
                 """
-		archiveArtifacts artifacts: 'Builds/latest_build.tar.gz'
 	        slackSend failOnError: true, color: "#439FE0", message: "Build Started: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
         }
 
