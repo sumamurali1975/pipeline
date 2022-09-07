@@ -99,8 +99,8 @@ stage('Unit Tests') {
 			source $WORKSPACE/miniconda/etc/profile.d/conda.sh
 			conda activate mlops2
 			conda list
-			#export PYSPARK_PYTHON = /usr/local/bin/python3.8
-			#export PYSPARK_DRIVER_PYTHON = /usr/local/bin/python3.8
+			export PYSPARK_PYTHON = /usr/local/bin/python3.8
+			export PYSPARK_DRIVER_PYTHON = /usr/local/bin/python3.8
 			# Python tests
 			python3.8 -m pytest --junit-xml=${TESTRESULTPATH}/TEST-libout.xml ${LIBRARYPATH}/python/dbxdemo/test*.py || true
 			"""
