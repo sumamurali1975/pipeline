@@ -183,7 +183,6 @@ stage('Databricks Deploy') {
 		      slackSend color: '#FF0000', message:' Databricks Pipeline Deployment Finished', iconEmoji: ":white_check_mark:"
             }
           }
-    }
   }
 	
 stage('Report Test Results') {
