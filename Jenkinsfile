@@ -96,9 +96,6 @@ stage('Unit Tests') {
             try {
 		 withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) {   
 		      sh """#!/bin/bash
-			source $WORKSPACE/miniconda/etc/profile.d/conda.sh
-			conda activate mlops2
-			conda list
 			export PYSPARK_PYTHON = /usr/local/bin/python3.8
 			export PYSPARK_DRIVER_PYTHON = /usr/local/bin/python3.8
 			# Python tests
