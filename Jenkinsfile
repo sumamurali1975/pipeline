@@ -167,25 +167,21 @@ pipeline {
         }
    
 	stage('Databricks Deploy') {
-		 steps {        
-		      	sh """#!/bin/bash
-			source $WORKSPACE/miniconda/etc/profile.d/conda.sh
-			conda activate mlops2
-			export PATH="$HOME/.local/bin:$PATH"
-
-
-			# Use Databricks CLI to deploy notebooks
-			databricks workspace mkdirs ${WORKSPACEPATH}
-			databricks workspace import_dir --overwrite ${BUILDPATH}/Workspace ${WORKSPACEPATH}
-			dbfs cp -r ${BUILDPATH}/Libraries/python ${DBFSPATH}
-			"""
+		 steps {
 			withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) {
 				sh """#!/bin/bash
-				#Get space delimited list of libraries
-				LIBS=\$(find ${BUILDPATH}/Libraries/python/ -name '*.whl' | sed 's#.*/##' | paste -sd " ")
+				source $WORKSPACE/miniconda/etc/profile.d/conda.sh
+				conda activate mlops2
+				export PATH="$HOME/.local/bin:$PATH"
+
+
+				# Use Databricks CLI to deploy notebooks
+				databricks workspace mkdirs ${WORKSPACEPATH}
+				databricks workspace import_dir --overwrite ${BUILDPATH}/Workspace ${WORKSPACEPATH}
+				dbfs cp -r ${BUILDPATH}/Libraries/python ${DBFSPATH}
 				"""
-			      slackSend color: '#BADA55', message:'Pipeline Databricks Deploy Done'
-			      slackSend color: '#FF0000', message:' Databricks Pipeline Deployment Finished', iconEmoji: ":white_check_mark:"
+				slackSend color: '#BADA55', message:'Pipeline Databricks Deploy Done'
+				slackSend color: '#FF0000', message:' Databricks Pipeline Deployment Finished', iconEmoji: ":white_check_mark:"
 		    	}
 		 }
 	}
