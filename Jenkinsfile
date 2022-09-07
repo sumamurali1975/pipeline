@@ -100,7 +100,7 @@ stage('Unit Tests') {
 			conda activate mlops2
 			conda list
 			# Python tests
-			python3.8 -m pytest --junit-xml=${TESTRESULTPATH}/TEST-libout.xml ${LIBRARYPATH}/python/dbxdemo/test*.py || true
+			python3 -m pytest --junit-xml=${TESTRESULTPATH}/TEST-libout.xml ${LIBRARYPATH}/python/dbxdemo/test*.py || true
 			"""
 		 }
           } catch(err) {
