@@ -100,8 +100,8 @@ stage('Unit Tests') {
 			conda activate mlops2
 			conda list
 			databricks-connect -h
-			export PYSPARK_PYTHON = /databricks/python3/bin/python3
-			export PYSPARK_DRIVER_PYTHON = /databricks/python3/bin/python3
+			export PYSPARK_PYTHON = /bin/python3
+			export PYSPARK_DRIVER_PYTHON = /bin/python3
 			# Configure Databricks Connect for testing
 			echo "${DBURL}
 			$TOKEN
