@@ -143,7 +143,7 @@ pipeline {
 			  find ${LIBRARYPATH} -name '*.whl' | xargs -I '{}' cp '{}' ${BUILDPATH}/Libraries/python/
 
 			  # Generate artifact
-			  #tar -czvf Builds/latest_build.tar.gz ${BUILDPATH}
+			  tar -czvf Builds/latest_build.tar.gz ${BUILDPATH}
 			"""
 			slackSend failOnError: true, color: "#439FE0", message: "Build Started: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 		}
@@ -166,9 +166,8 @@ pipeline {
         }
    
 	stage('Databricks Deploy') {
-		 steps { 
-		    withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) {        
-		      sh """#!/bin/bash
+		 steps {        
+		      	sh """#!/bin/bash
 			source $WORKSPACE/miniconda/etc/profile.d/conda.sh
 			conda activate mlops2
 			export PATH="$HOME/.local/bin:$PATH"
@@ -179,9 +178,14 @@ pipeline {
 			databricks workspace import_dir --overwrite ${BUILDPATH}/Workspace ${WORKSPACEPATH}
 			dbfs cp -r ${BUILDPATH}/Libraries/python ${DBFSPATH}
 			"""
+			withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) {
+				sh """#!/bin/bash
+				#Get space delimited list of libraries
+				LIBS=\$(find ${BUILDPATH}/Libraries/python/ -name '*.whl' | sed 's#.*/##' | paste -sd " ")
+				"""
 			      slackSend color: '#BADA55', message:'Pipeline Databricks Deploy Done'
 			      slackSend color: '#FF0000', message:' Databricks Pipeline Deployment Finished', iconEmoji: ":white_check_mark:"
-		    }
+		    	}
 		 }
 	}
 	  
