@@ -17,8 +17,8 @@ pipeline {
     DBFSPATH        = "dbfs:/FileStore/"
     BUILDPATH       = "${WORKSPACE}/Builds/${env.JOB_NAME}-${env.BUILD_NUMBER}"
     SCRIPTPATH      = "./Scripts"
-    projectName = "${WORKSPACE}"  //var/lib/jenkins/workspace/Demopipeline/
-    projectKey = "key"
+    projectName = "${WORKSPACE}"  //var/lib/jenkins/workspace/testpipeline/
+    projectKey = "pythonproject"
  }
 
   stages {
@@ -166,55 +166,16 @@ pipeline {
                     python -m coverage xml
 		   '''    
 				    
-					 slackSend color: '#BADA55', message: 'Pipeline SonarQube analysis Done', timestamp :''
+					 //slackSend color: '#BADA55', message: 'Pipeline SonarQube analysis Done', timestamp :''
 			      }
 		    }
 
 		}
         }
    
-	stage('Databricks Deploy') {
-		 steps {
-			withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN')]) {
-				sh """#!/bin/bash
-				source $WORKSPACE/miniconda/etc/profile.d/conda.sh
-				conda activate mlops2
-				export PATH="$HOME/.local/bin:$PATH"
-
-
-				# Use Databricks CLI to deploy notebooks
-				databricks workspace mkdirs ${WORKSPACEPATH}
-				databricks workspace import_dir --overwrite ${BUILDPATH}/Workspace ${WORKSPACEPATH}
-				dbfs cp -r ${BUILDPATH}/Libraries/python ${DBFSPATH}
-				"""
-				slackSend color: '#BADA55', message:'Pipeline Databricks Deploy Done'
-				slackSend color: '#FF0000', message:' Databricks Pipeline Deployment Finished', iconEmoji: ":white_check_mark:"
-		    	}
-		 }
-	}
+	
 	  
   }
 	
-  post {
-		success {
-		  withAWS(credentials:'AWSCredentialsForSnsPublish') {
-				snsPublish(
-					topicArn:'arn:aws:sns:us-east-1:872161624847:mdlp-build-status-topic', 
-					subject:"Job:${env.JOB_NAME}-Build Number:${env.BUILD_NUMBER} is a ${currentBuild.currentResult}", 
-					message: "Please note that for Jenkins job:${env.JOB_NAME} of build number:${currentBuild.number} - ${currentBuild.currentResult} happened!"
-				)
-			}
-		}
-		failure {
-		  withAWS(credentials:'AWSCredentialsForSnsPublish') {
-				snsPublish(
-					topicArn:'arn:aws:sns:us-east-1:872161624847:mdlp-build-status-topic', 
-					subject:"Job:${env.JOB_NAME}-Build Number:${env.BUILD_NUMBER} is a ${currentBuild.currentResult}", 
-					message: "Please note that for Jenkins job:${env.JOB_NAME} of build number:${currentBuild.number} - ${currentBuild.currentResult} happened! Details here: ${BUILD_URL}."
-				)
-			}
-		}
-  }
-}
-
+  
 
