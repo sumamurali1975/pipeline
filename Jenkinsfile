@@ -17,7 +17,7 @@ pipeline {
     DBFSPATH        = "dbfs:/FileStore/"
     BUILDPATH       = "${WORKSPACE}/Builds/${env.JOB_NAME}-${env.BUILD_NUMBER}"
     SCRIPTPATH      = "./Scripts"
-    projectName = "${WORKSPACE}"  //var/lib/jenkins/workspace/testpipeline/
+    projectName = "pythonproject"  //workspace ----- /var/lib/jenkins/workspace/testpipeline/
     projectKey = "pythonproject"
  }
 
